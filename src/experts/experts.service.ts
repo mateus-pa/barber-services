@@ -21,5 +21,9 @@ export class ExpertsService {
                 phone: data.phone
             }
         });
-}
+    }
+
+    async findAllExperts() {
+    return await this.prisma.expert.findMany();
+    }
 }
