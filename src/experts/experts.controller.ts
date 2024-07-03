@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpStatus, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Param, Post, Res } from '@nestjs/common';
 import { Response } from 'express';
 import CreateExpertsDto from './dtos/create-experts';
 import { ExpertsService } from './experts.service';
@@ -15,7 +15,7 @@ export class ExpertsController {
     
     if (expertExists) {
       return res.status(HttpStatus.BAD_REQUEST).json({ 
-        error: 'Já existe um profissional com esse email'
+        error: "Já existe um profissional com esse email"
        });
   }
 
@@ -27,5 +27,15 @@ export class ExpertsController {
   async getExperts(@Res() res: Response) {
     const experts = await this.expertsService.findAllExperts();
     return res.status(HttpStatus.OK).json(experts);
+  }
+
+  @Get(":id")
+  async getExpertById(@Param("id") id: string, @Res() res: Response) {
+    const expert = await this.expertsService.findExpertById(id);
+
+    if(!expert) {
+      return res.status(HttpStatus.NOT_FOUND).json({ error: "Profissional não foi encontrado"});
+    }
+    return res.status(HttpStatus.OK).json(expert);
   }
 }
