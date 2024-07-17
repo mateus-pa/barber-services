@@ -1,4 +1,4 @@
-import { Body, Controller, HttpStatus, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Post, Query, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { ExpertsService } from 'src/experts/experts.service';
 import CreateQueueDto from './dtos/create-queue';
@@ -38,4 +38,28 @@ export class QueuesController {
 
     return res.status(HttpStatus.CREATED).json(queue);
   }
+
+  @Get()
+  async getExpertQueues(
+    @Query("expertId") expertId: string,
+    @Res() res: Response
+  ) {
+
+    if (expertId) {
+      const expert = await this.expertsService.findExpertById(expertId);
+
+      if (!expert) {
+        return res.status(HttpStatus.NOT_FOUND).json({
+          error: 'Profissional não foi encontrado'
+    });
+      }
+       
+      const queues = await this.queuesService.getExpertQueues(expertId);
+      return res.status(HttpStatus.OK).json(queues);
+    }
+
+    const queues = await this.queuesService.getQueues();
+    return res.status(HttpStatus.OK).json(queues);
+  }
+
 }

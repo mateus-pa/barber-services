@@ -20,4 +20,22 @@ export class QueuesService {
             }
         });
     }
+
+    async getQueues() {
+        return await this.prisma.queue.findMany({include: {
+            expert: true
+        }
+    });
+    }
+
+    async getExpertQueues(expertId: string) {
+        return await this.prisma.queue.findMany({
+            where: {
+                expertId
+            },
+            include: {
+                expert: true
+            }
+        });
+    }
 }
