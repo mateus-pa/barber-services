@@ -1,4 +1,4 @@
-import { Body, Controller, HttpStatus, Param, Patch, Post, Res } from '@nestjs/common';
+import { Body, Controller, Delete, HttpStatus, Param, Patch, Post, Res } from '@nestjs/common';
 import { Response } from 'express';
 import CreateQueuescustomersDto from './dtos/create-queuescustomers';
 import { QueuescustomersService } from './queuescustomers.service';
@@ -37,7 +37,20 @@ export class QueuescustomersController {
     }
 
     await this.queuescustomersService.attendCustomer(customer.id);
+    return res.status(HttpStatus.NO_CONTENT).send();
+  }
 
+  @Delete(":id")
+  async deleteCustomer(@Param("id") id: string, @Res() res: Response) {
+    const customer = await this.queuescustomersService.findCustomer(+id);
+
+    if (!customer) {
+      return res.status(HttpStatus.NOT_FOUND).json({
+        error: "O cliente não foi encontrado"
+      });
+    }
+
+    await this.queuescustomersService.deleteCustomer(customer.id);
     return res.status(HttpStatus.NO_CONTENT).send();
   }
 }
