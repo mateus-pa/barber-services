@@ -25,7 +25,7 @@ module.exports = {
         arrowParens: "avoid",
         useTabs: true,
         trailingComma: "none",
-        endOfLine: true
+        endOfLine: "auto"
       },
     ],
     '@typescript-eslint/interface-name-prefix': 'off',
