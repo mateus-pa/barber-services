@@ -5,9 +5,11 @@ import {
 	HttpStatus,
 	Post,
 	Query,
-	Res
+	Res,
+	UseGuards
 } from "@nestjs/common";
 import { Response } from "express";
+import { JwtAuthGuard } from "src/auth/guards/jwt-guard";
 import { ExpertsService } from "src/experts/experts.service";
 import CreateQueueDto from "./dtos/create-queue";
 import { QueuesService } from "./queues.service";
@@ -19,6 +21,7 @@ export class QueuesController {
 		private readonly expertsService: ExpertsService
 	) {}
 
+	@UseGuards(JwtAuthGuard)
 	@Post()
 	async createQueue(@Body() data: CreateQueueDto, @Res() res: Response) {
 		const expert = await this.expertsService.findExpertById(data.expertId);
