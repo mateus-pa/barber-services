@@ -1,73 +1,50 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+![Barber service](https://i.imgur.com/TCYBmWM.jpg)
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+<p align="center"><b>Projeto API Barber Service - Nest.js 💈 </b></p>
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 📝Sobre
 
-## Description
+Projeto de finalização do curso da trilha de Nest.js da Cubos Academy:
+- API Rest
+- Programação assíncrona
+- CRUD
+- JSON
+- Framework Express.js
+- Framework Nest.js
+- Tipagem e orientação à objetos Typescript
+- Criptografia bcrypt
+- Token de autenticação JWT
+- Validação class validator
+- Eslint e Prettier para padronização
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## ⚙️Funcionalidades
+- Recurso de experts para: criação, alteração, listagem completa e busca por ID
+- Recurso de queues para: criação, listagem e busca de fila do expert do dia atual
+- Recurso de queues customers para: adicionar, atender e remover cliente da fila do dia
+- Recurso de users para: criação de usuário para rotas autenticadas
+- Recurso de auth para: login, validação e payload com profile do usuário logado
 
-## Installation
+## 👨🏽‍💻Tecnologias
+- Javascript
+- Typescript
+- Node.js
+- Express.js
+- Nest.js
+- PrismaORM
+- PostgreSQL
 
-```bash
-$ npm install
-```
+## 🔧Requisitos
+- npm instalado na sua máquina
+- node instalado na sua máquina
+- editor de código instalado na sua máquina (recomendação: Visual Studio Code)
 
-## Running the app
+## 🖥️Como instalar
+1. Clone este repositório;
+2. Certifique-se de ter o Node.js e o PostgreSQL instalados em seu sistema;
+3. Crie um banco de dados PostgreSQL e configure as variavéis de ambiente em um arquivo `.env` dentro da raiz do projeto seguindo o formato do `.env.example`;
+4. Na raiz do projeto, execute `npm install` para instalar as dependências que estão listadas em `Tecnologias utilizadas` deste README;
+5. Rode o comando `npx prisma migrate dev` no terminal;
+6. Inicie o servidor no terminal com `npm run start`;
+7. O sistema estará disponível em `http://localhost:3000`.
 
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+Certifique-se de que você possui todas as dependências instaladas (incluindo às necessàrias para seu controle local) e as variáveis de ambiente configuradas.
