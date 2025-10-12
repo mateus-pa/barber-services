@@ -7,7 +7,7 @@ import {
 	Patch,
 	Post,
 	Res,
-	UseGuards
+	UseGuards,
 } from "@nestjs/common";
 import { Response } from "express";
 import { JwtAuthGuard } from "src/auth/guards/jwt-guard";
@@ -20,6 +20,7 @@ export class QueuescustomersController {
 		private readonly queuescustomersService: QueuescustomersService
 	) {}
 
+	@UseGuards(JwtAuthGuard)
 	@Post()
 	async addCustomer(
 		@Body() data: CreateQueuescustomersDto,
@@ -31,14 +32,23 @@ export class QueuescustomersController {
 
 		if (!queueExists) {
 			return res.status(HttpStatus.BAD_REQUEST).json({
-				error: "Profissional não possui uma fila para hoje"
+				error: "Profissional não possui uma fila para hoje",
+			});
+		}
+
+		const appointmentTimeIsPast = new Date(data.appointmentTime) < new Date();
+
+		if (appointmentTimeIsPast) {
+			return res.status(HttpStatus.BAD_REQUEST).json({
+				error: "O horário do agendamento não pode ser para uma data no passado",
 			});
 		}
 
 		const customer = await this.queuescustomersService.addCustomer({
 			name: data.name,
 			service: data.service,
-			queueId: queueExists.id
+			queueId: queueExists.id,
+			appointmentTime: data.appointmentTime,
 		});
 
 		return res.status(HttpStatus.CREATED).json(customer);
@@ -51,7 +61,7 @@ export class QueuescustomersController {
 
 		if (!customer) {
 			return res.status(HttpStatus.NOT_FOUND).json({
-				error: "O cliente não foi encontrado"
+				error: "O cliente não foi encontrado",
 			});
 		}
 
@@ -66,7 +76,7 @@ export class QueuescustomersController {
 
 		if (!customer) {
 			return res.status(HttpStatus.NOT_FOUND).json({
-				error: "O cliente não foi encontrado"
+				error: "O cliente não foi encontrado",
 			});
 		}
 

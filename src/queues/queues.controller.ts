@@ -5,8 +5,9 @@ import {
 	HttpStatus,
 	Post,
 	Query,
+	Req,
 	Res,
-	UseGuards
+	UseGuards,
 } from "@nestjs/common";
 import { Response } from "express";
 import { JwtAuthGuard } from "src/auth/guards/jwt-guard";
@@ -23,12 +24,20 @@ export class QueuesController {
 
 	@UseGuards(JwtAuthGuard)
 	@Post()
-	async createQueue(@Body() data: CreateQueueDto, @Res() res: Response) {
-		const expert = await this.expertsService.findExpertById(data.expertId);
+	async createQueue(
+		@Body() data: CreateQueueDto,
+		@Res() res: Response,
+		@Req() req
+	) {
+		const userId = req.user.id;
+		const expert = await this.expertsService.findExpertById(
+			data.expertId,
+			userId
+		);
 
 		if (!expert) {
 			return res.status(HttpStatus.NOT_FOUND).json({
-				error: "Profissional não foi encontrado"
+				error: "Profissional não foi encontrado",
 			});
 		}
 
@@ -38,7 +47,7 @@ export class QueuesController {
 
 		if (queueExists) {
 			return res.status(HttpStatus.BAD_REQUEST).json({
-				error: "Profissional ja possui uma fila para hoje"
+				error: "Profissional ja possui uma fila para hoje",
 			});
 		}
 
@@ -47,17 +56,20 @@ export class QueuesController {
 		return res.status(HttpStatus.CREATED).json(queue);
 	}
 
+	@UseGuards(JwtAuthGuard)
 	@Get()
 	async getExpertQueues(
 		@Query("expertId") expertId: string,
-		@Res() res: Response
+		@Res() res: Response,
+		@Req() req
 	) {
+		const userId = req.user.id;
 		if (expertId) {
-			const expert = await this.expertsService.findExpertById(expertId);
+			const expert = await this.expertsService.findExpertById(expertId, userId);
 
 			if (!expert) {
 				return res.status(HttpStatus.NOT_FOUND).json({
-					error: "Profissional não foi encontrado"
+					error: "Profissional não foi encontrado",
 				});
 			}
 
@@ -69,6 +81,7 @@ export class QueuesController {
 		return res.status(HttpStatus.OK).json(queues);
 	}
 
+	@UseGuards(JwtAuthGuard)
 	@Get("today")
 	async getQueuesToday(@Res() res: Response) {
 		const queues = await this.queuesService.getQueuesToday();

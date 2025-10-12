@@ -9,18 +9,21 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  // directUrl = env("DIRECT_URL")
 }
 
 model Expert {
   id     String  @id @default(uuid())
   name   String
-  email  String  @unique
+  email  String
   phone  String?
+  userId String
+  user   User    @relation(fields: [userId], references: [id])
   queues Queue[]
 
+  @@unique([email, userId])
   @@map("experts")
 }
 
@@ -35,21 +38,24 @@ model Queue {
 }
 
 model QueueCustomer {
-  id         Int     @id @default(autoincrement())
-  queue      Queue   @relation(fields: [queueId], references: [id])
-  queueId    String
-  name       String
-  service    String
-  isAwaiting Boolean @default(true)
+  id              Int      @id @default(autoincrement())
+  queue           Queue    @relation(fields: [queueId], references: [id])
+  queueId         String
+  name            String
+  service         String
+  isAwaiting      Boolean  @default(true)
+  appointmentTime DateTime
 
+  @@unique([queueId, appointmentTime])
   @@map("queuescustomers")
 }
 
 model User {
-  id       String @id @default(uuid())
+  id       String   @id @default(uuid())
   name     String
-  email    String @unique
+  email    String   @unique
   password String
+  experts  Expert[]
 
   @@map("users")
 }

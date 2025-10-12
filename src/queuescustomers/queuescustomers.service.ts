@@ -5,6 +5,7 @@ type CreateCustomer = {
 	name: string;
 	service: string;
 	queueId: string;
+	appointmentTime: Date;
 };
 
 @Injectable()
@@ -13,7 +14,7 @@ export class QueuescustomersService {
 
 	async addCustomer(data: CreateCustomer) {
 		return await this.prisma.queueCustomer.create({
-			data
+			data,
 		});
 	}
 
@@ -22,36 +23,36 @@ export class QueuescustomersService {
 			where: {
 				expertId,
 				createdAt: {
-					equals: new Date()
-				}
-			}
+					equals: new Date(),
+				},
+			},
 		});
 	}
 
 	async attendCustomer(customerId: number) {
 		await this.prisma.queueCustomer.update({
 			where: {
-				id: customerId
+				id: customerId,
 			},
 			data: {
-				isAwaiting: false
-			}
+				isAwaiting: false,
+			},
 		});
 	}
 
 	async findCustomer(customerId: number) {
 		return await this.prisma.queueCustomer.findFirst({
 			where: {
-				id: customerId
-			}
+				id: customerId,
+			},
 		});
 	}
 
 	async deleteCustomer(customerId: number) {
 		await this.prisma.queueCustomer.delete({
 			where: {
-				id: customerId
-			}
+				id: customerId,
+			},
 		});
 	}
 }

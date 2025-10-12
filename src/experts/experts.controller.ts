@@ -1,15 +1,16 @@
 import {
+	BadRequestException,
 	Body,
 	Controller,
 	Get,
-	HttpStatus,
+	HttpCode,
+	NotFoundException,
 	Param,
 	Patch,
 	Post,
-	Res,
-	UseGuards
+	Req,
+	UseGuards,
 } from "@nestjs/common";
-import { Response } from "express";
 import { JwtAuthGuard } from "src/auth/guards/jwt-guard";
 import CreateExpertsDto from "./dtos/create-experts";
 import UpdateExpertsDto from "./dtos/update-experts";
@@ -21,67 +22,69 @@ export class ExpertsController {
 
 	@UseGuards(JwtAuthGuard)
 	@Post()
-	async create(@Body() data: CreateExpertsDto, @Res() res: Response) {
+	async create(@Body() data: CreateExpertsDto, @Req() req) {
+		const userId = req.user.id;
 		const expertExists = await this.expertsService.findExpertByEmail(
-			data.email
+			data.email,
+			userId
 		);
 
 		if (expertExists) {
-			return res.status(HttpStatus.BAD_REQUEST).json({
-				error: "Já existe um profissional com esse email"
-			});
+			throw new BadRequestException("Já existe um profissional com esse email");
 		}
-
-		const expert = await this.expertsService.createExpert(data);
-		return res.status(HttpStatus.CREATED).json(expert);
+		const expert = await this.expertsService.createExpert(data, userId);
+		return expert;
 	}
 
+	@UseGuards(JwtAuthGuard)
 	@Get()
-	async getExperts(@Res() res: Response) {
-		const experts = await this.expertsService.findAllExperts();
-		return res.status(HttpStatus.OK).json(experts);
+	async getExperts(@Req() req) {
+		const userId = req.user.id;
+		const experts = await this.expertsService.findAllExperts(userId);
+		return experts;
 	}
 
+	@UseGuards(JwtAuthGuard)
 	@Get(":id")
-	async getExpertById(@Param("id") id: string, @Res() res: Response) {
-		const expert = await this.expertsService.findExpertById(id);
+	async getExpertById(@Param("id") id: string, @Req() req) {
+		const userId = req.user.id;
+		const expert = await this.expertsService.findExpertById(id, userId);
 
 		if (!expert) {
-			return res
-				.status(HttpStatus.NOT_FOUND)
-				.json({ error: "Profissional não foi encontrado" });
+			throw new NotFoundException("Profissional não foi encontrado");
 		}
-		return res.status(HttpStatus.OK).json(expert);
+
+		return expert;
 	}
 
 	@UseGuards(JwtAuthGuard)
 	@Patch(":id")
+	@HttpCode(204)
 	async updateById(
 		@Param("id") id: string,
 		@Body() data: UpdateExpertsDto,
-		@Res() res: Response
+		@Req() req
 	) {
-		const expert = await this.expertsService.findExpertById(id);
+		const userId = req.user.id;
+
+		const expert = await this.expertsService.findExpertById(id, userId);
 
 		if (!expert) {
-			return res
-				.status(HttpStatus.NOT_FOUND)
-				.json({ error: "Profissional não foi encontrado" });
+			throw new NotFoundException("Profissional não foi encontrado");
 		}
 
 		if (data.email) {
 			const emailExists = await this.expertsService.findExpertByEmail(
-				data.email
+				data.email,
+				userId
 			);
 
-			if (emailExists && emailExists.email !== expert.email) {
-				return res.status(HttpStatus.BAD_REQUEST).json({
-					error: "Já existe um outro profissional com esse email"
-				});
+			if (emailExists && emailExists.id !== id) {
+				throw new BadRequestException(
+					"Já existe um outro profissional com esse email"
+				);
 			}
 		}
-
-		await this.expertsService.updateExpert(id, { ...expert, ...data });
-		return res.status(HttpStatus.NO_CONTENT).send();
+		await this.expertsService.updateExpert(id, data, userId);
 	}
 }
