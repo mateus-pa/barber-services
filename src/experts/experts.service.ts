@@ -47,4 +47,13 @@ export class ExpertsService {
 	async updateExpert(id: string, data: UpdateExpertsDto, userId: string) {
 		await this.prisma.expert.update({ where: { id, userId }, data });
 	}
+
+	async removeExpertById(id: string, userId: string) {
+		return await this.prisma.expert.delete({
+			where: {
+				id,
+				userId,
+			},
+		});
+	}
 }

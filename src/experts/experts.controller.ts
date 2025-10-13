@@ -2,6 +2,7 @@ import {
 	BadRequestException,
 	Body,
 	Controller,
+	Delete,
 	Get,
 	HttpCode,
 	NotFoundException,
@@ -86,5 +87,18 @@ export class ExpertsController {
 			}
 		}
 		await this.expertsService.updateExpert(id, data, userId);
+	}
+
+	@UseGuards(JwtAuthGuard)
+	@Delete(":id")
+	@HttpCode(204)
+	async removeById(@Param("id") id: string, @Req() req) {
+		const userId = req.user.id;
+
+		const expert = await this.expertsService.removeExpertById(id, userId);
+
+		if (!expert) {
+			throw new NotFoundException("Profissional não foi encontrado");
+		}
 	}
 }
