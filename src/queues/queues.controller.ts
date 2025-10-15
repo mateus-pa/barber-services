@@ -3,6 +3,7 @@ import {
 	Controller,
 	Get,
 	HttpStatus,
+	Param,
 	Post,
 	Query,
 	Req,
@@ -87,5 +88,39 @@ export class QueuesController {
 		const queues = await this.queuesService.getQueuesToday();
 
 		return res.status(HttpStatus.OK).json(queues);
+	}
+
+	@UseGuards(JwtAuthGuard)
+	@Get("today/:expertId")
+	async getExpertQueueToday(
+		@Param("expertId") expertId: string,
+		@Res() res: Response,
+		@Req() req
+	) {
+		if (!expertId) {
+			return res.status(HttpStatus.BAD_REQUEST).json({
+				error: "O parâmetro expertId é obrigatório",
+			});
+		}
+
+		const userId = req.user.id;
+
+		const expert = await this.expertsService.findExpertById(expertId, userId);
+		if (!expert) {
+			return res.status(HttpStatus.NOT_FOUND).json({
+				error: "Profissional não foi encontrado",
+			});
+		}
+
+		const queueExists =
+			await this.queuesService.queueExpertExistsToday(expertId);
+
+		if (!queueExists) {
+			await this.queuesService.createQueue({ expertId });
+		}
+
+		const queue = await this.queuesService.getExpertQueueToday(expertId);
+
+		return res.status(HttpStatus.OK).json(queue);
 	}
 }

@@ -42,6 +42,29 @@ export class QueuesService {
 		});
 	}
 
+	async getExpertQueueToday(expertId: string) {
+		const { startOfTodayUTC, startOfTomorrowUTC } =
+			this.calculateTodayIntervalUTC();
+
+		return await this.prisma.queue.findFirst({
+			where: {
+				expertId,
+				createdAt: {
+					gte: startOfTodayUTC,
+					lt: startOfTomorrowUTC,
+				},
+			},
+			include: {
+				expert: true,
+				queuecustomers: {
+					orderBy: {
+						appointmentTime: "asc",
+					},
+				},
+			},
+		});
+	}
+
 	async getQueues() {
 		return await this.prisma.queue.findMany({
 			include: {
