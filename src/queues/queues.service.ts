@@ -74,7 +74,11 @@ export class QueuesService {
 			},
 			include: {
 				expert: true,
-				queuecustomers: true,
+				queuecustomers: {
+					orderBy: {
+						appointmentTime: "asc",
+					},
+				},
 			},
 		});
 	}

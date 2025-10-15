@@ -1,4 +1,6 @@
 import { Injectable } from "@nestjs/common";
+import { addDays, startOfDay } from "date-fns";
+import { fromZonedTime } from "date-fns-tz";
 import { PrismaService } from "src/database/prisma.service";
 
 type CreateCustomer = {
@@ -12,6 +14,21 @@ type CreateCustomer = {
 export class QueuescustomersService {
 	constructor(private readonly prisma: PrismaService) {}
 
+	private readonly TIMEZONE_BRASIL = "America/Sao_Paulo";
+
+	private calculateTodayIntervalUTC() {
+		const now = new Date();
+		const startOfTodayInServerTime = startOfDay(now);
+		const startOfTodayUTC = fromZonedTime(
+			startOfTodayInServerTime,
+			this.TIMEZONE_BRASIL
+		);
+
+		const startOfTomorrowUTC = addDays(startOfTodayUTC, 1);
+
+		return { startOfTodayUTC, startOfTomorrowUTC };
+	}
+
 	async addCustomer(data: CreateCustomer) {
 		return await this.prisma.queueCustomer.create({
 			data,
@@ -19,11 +36,23 @@ export class QueuescustomersService {
 	}
 
 	async getExpertQueueToday(expertId: string) {
+		const { startOfTodayUTC, startOfTomorrowUTC } =
+			this.calculateTodayIntervalUTC();
+
 		return await this.prisma.queue.findFirst({
 			where: {
 				expertId,
 				createdAt: {
-					equals: new Date(),
+					gte: startOfTodayUTC,
+					lt: startOfTomorrowUTC,
+				},
+			},
+			include: {
+				expert: true,
+				queuecustomers: {
+					orderBy: {
+						appointmentTime: "asc",
+					},
 				},
 			},
 		});
