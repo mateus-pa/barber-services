@@ -29,7 +29,7 @@ model Expert {
 
 model Queue {
   id             String          @id @default(uuid())
-  createdAt      DateTime        @default(now()) @db.Date()
+  createdAt      DateTime        @default(now()) @db.Timestamptz(3)
   expert         Expert          @relation(fields: [expertId], references: [id])
   expertId       String
   queuecustomers QueueCustomer[]

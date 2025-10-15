@@ -44,6 +44,24 @@ export class QueuescustomersController {
 			});
 		}
 
+		const appointmentDate = new Date(data.appointmentTime);
+		const queueDate = new Date(queueExists.createdAt);
+
+		const getDateOnly = (date: Date) => {
+			const d = new Date(date);
+			d.setHours(0, 0, 0, 0);
+			return d.getTime();
+		};
+
+		const isSameDay = getDateOnly(appointmentDate) === getDateOnly(queueDate);
+
+		if (!isSameDay) {
+			return res.status(HttpStatus.BAD_REQUEST).json({
+				error:
+					"O agendamento deve ser para o mesmo dia da fila ativa do profissional.",
+			});
+		}
+
 		const customer = await this.queuescustomersService.addCustomer({
 			name: data.name,
 			service: data.service,

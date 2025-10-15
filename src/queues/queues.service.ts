@@ -1,4 +1,6 @@
 import { Injectable } from "@nestjs/common";
+import { addDays, startOfDay } from "date-fns";
+import { fromZonedTime } from "date-fns-tz";
 import { PrismaService } from "src/database/prisma.service";
 import CreateQueueDto from "./dtos/create-queue";
 
@@ -6,60 +8,74 @@ import CreateQueueDto from "./dtos/create-queue";
 export class QueuesService {
 	constructor(private readonly prisma: PrismaService) {}
 
+	private readonly TIMEZONE_BRASIL = "America/Sao_Paulo";
+
+	private calculateTodayIntervalUTC() {
+		const now = new Date();
+		const startOfTodayInServerTime = startOfDay(now);
+		const startOfTodayUTC = fromZonedTime(
+			startOfTodayInServerTime,
+			this.TIMEZONE_BRASIL
+		);
+
+		const startOfTomorrowUTC = addDays(startOfTodayUTC, 1);
+
+		return { startOfTodayUTC, startOfTomorrowUTC };
+	}
+
 	async createQueue(data: CreateQueueDto) {
 		return await this.prisma.queue.create({ data });
 	}
 
 	async queueExpertExistsToday(expertId: string) {
+		const { startOfTodayUTC, startOfTomorrowUTC } =
+			this.calculateTodayIntervalUTC();
+
 		return await this.prisma.queue.findFirst({
 			where: {
+				expertId,
 				createdAt: {
-					equals: new Date()
+					gte: startOfTodayUTC,
+					lt: startOfTomorrowUTC,
 				},
-				expertId
-			}
+			},
 		});
 	}
 
 	async getQueues() {
 		return await this.prisma.queue.findMany({
 			include: {
-				expert: true
-			}
+				expert: true,
+			},
 		});
 	}
 
 	async getExpertQueues(expertId: string) {
 		return await this.prisma.queue.findMany({
 			where: {
-				expertId
+				expertId,
 			},
 			include: {
-				expert: true
-			}
+				expert: true,
+			},
 		});
 	}
 
 	async getQueuesToday() {
-		const queuesToday = await this.prisma.queue.findMany({
+		const { startOfTodayUTC, startOfTomorrowUTC } =
+			this.calculateTodayIntervalUTC();
+
+		return await this.prisma.queue.findMany({
 			where: {
 				createdAt: {
-					equals: new Date()
-				}
+					gte: startOfTodayUTC,
+					lt: startOfTomorrowUTC,
+				},
 			},
 			include: {
 				expert: true,
-				queuecustomers: true
-			}
-		});
-
-		return queuesToday.map(queue => {
-			return {
-				...queue,
-				queuecustomers: queue.queuecustomers.filter(
-					customer => customer.isAwaiting
-				)
-			};
+				queuecustomers: true,
+			},
 		});
 	}
 }
