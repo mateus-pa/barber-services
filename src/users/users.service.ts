@@ -13,29 +13,67 @@ export class UsersService {
 			data: {
 				name: data.name,
 				email: data.email,
-				password: pass
-			}
+				password: pass,
+			},
 		});
 	}
 
 	async findUserByEmail(email: string) {
 		return await this.prisma.user.findFirst({
 			where: {
-				email
-			}
+				email,
+			},
 		});
 	}
 
 	async findUserById(id: string) {
 		return await this.prisma.user.findFirst({
 			where: {
-				id
+				id,
 			},
 			select: {
 				id: true,
 				name: true,
-				email: true
-			}
+				email: true,
+			},
+		});
+	}
+
+	async deleteUserAndExperts(userId: string) {
+		return await this.prisma.$transaction(async (tx) => {
+			// 1. Encontrar todos os IDs dos experts que pertencem a este usuário
+			const experts = await tx.expert.findMany({
+				where: { userId: userId },
+				select: { id: true },
+			});
+
+			const expertIds = experts.map((expert) => expert.id);
+
+			const queuesDeletion = await tx.queue.deleteMany({
+				where: {
+					expertId: {
+						in: expertIds,
+					},
+				},
+			});
+
+			const expertsDeletion = await tx.expert.deleteMany({
+				where: {
+					userId: userId,
+				},
+			});
+
+			const userDeletion = await tx.user.delete({
+				where: {
+					id: userId,
+				},
+			});
+
+			return {
+				user: userDeletion,
+				expertsCount: expertsDeletion.count,
+				queuesCount: queuesDeletion.count,
+			};
 		});
 	}
 }
