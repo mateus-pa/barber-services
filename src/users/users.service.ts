@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import * as bcrypt from "bcrypt";
 import { PrismaService } from "src/database/prisma.service";
 import CreateUsersDto from "./dtos/create-users";
+import UpdateUsersDto from "./dtos/update-users";
 
 @Injectable()
 export class UsersService {
@@ -14,6 +15,23 @@ export class UsersService {
 				name: data.name,
 				email: data.email,
 				password: pass,
+			},
+		});
+	}
+
+	async updateUser(id: string, data: UpdateUsersDto) {
+		return await this.prisma.user.update({
+			where: {
+				id,
+			},
+			data: {
+				name: data.name,
+				email: data.email,
+			},
+			select: {
+				id: true,
+				name: true,
+				email: true,
 			},
 		});
 	}
@@ -41,7 +59,6 @@ export class UsersService {
 
 	async deleteUserAndExperts(userId: string) {
 		return await this.prisma.$transaction(async (tx) => {
-			// 1. Encontrar todos os IDs dos experts que pertencem a este usuário
 			const experts = await tx.expert.findMany({
 				where: { userId: userId },
 				select: { id: true },

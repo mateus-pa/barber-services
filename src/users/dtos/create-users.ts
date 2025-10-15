@@ -1,7 +1,8 @@
-import { IsEmail, IsNotEmpty } from "class-validator";
+import { IsEmail, IsNotEmpty, IsString } from "class-validator";
 
 export default class CreateUsersDto {
 	@IsNotEmpty({ message: "O campo nome é obrigatório" })
+	@IsString({ message: "O campo precisa ser um texto" })
 	name: string;
 
 	@IsNotEmpty({ message: "O campo email é obrigatório" })
