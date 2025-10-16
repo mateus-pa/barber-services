@@ -57,40 +57,15 @@ export class UsersService {
 		});
 	}
 
-	async deleteUserAndExperts(userId: string) {
+	async deleteUser(userId: string) {
 		return await this.prisma.$transaction(async (tx) => {
-			const experts = await tx.expert.findMany({
-				where: { userId: userId },
-				select: { id: true },
-			});
-
-			const expertIds = experts.map((expert) => expert.id);
-
-			const queuesDeletion = await tx.queue.deleteMany({
-				where: {
-					expertId: {
-						in: expertIds,
-					},
-				},
-			});
-
-			const expertsDeletion = await tx.expert.deleteMany({
-				where: {
-					userId: userId,
-				},
-			});
-
 			const userDeletion = await tx.user.delete({
 				where: {
 					id: userId,
 				},
 			});
 
-			return {
-				user: userDeletion,
-				expertsCount: expertsDeletion.count,
-				queuesCount: queuesDeletion.count,
-			};
+			return userDeletion;
 		});
 	}
 }

@@ -20,7 +20,7 @@ model Expert {
   email  String
   phone  String?
   userId String
-  user   User    @relation(fields: [userId], references: [id])
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   queues Queue[]
 
   @@unique([email, userId])
@@ -28,19 +28,21 @@ model Expert {
 }
 
 model Queue {
-  id             String          @id @default(uuid())
-  createdAt      DateTime        @default(now()) @db.Timestamptz(3)
-  expert         Expert          @relation(fields: [expertId], references: [id])
-  expertId       String
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  expert    Expert   @relation(fields: [expertId], references: [id], onDelete: Cascade)
+  expertId  String
+
   queuecustomers QueueCustomer[]
 
   @@map("queues")
 }
 
 model QueueCustomer {
-  id              Int      @id @default(autoincrement())
-  queue           Queue    @relation(fields: [queueId], references: [id])
-  queueId         String
+  id      Int    @id @default(autoincrement())
+  queue   Queue  @relation(fields: [queueId], references: [id], onDelete: Cascade)
+  queueId String
+
   name            String
   service         String
   isAwaiting      Boolean  @default(true)

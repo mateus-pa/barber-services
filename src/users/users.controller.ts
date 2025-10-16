@@ -50,11 +50,9 @@ export class UsersController {
 				data.email
 			);
 			if (userEmailExists) {
-				return res
-					.status(HttpStatus.BAD_REQUEST)
-					.json({
-						error: "Este novo e-mail já está sendo utilizado por outra conta.",
-					});
+				return res.status(HttpStatus.BAD_REQUEST).json({
+					error: "Este novo e-mail já está sendo utilizado por outra conta.",
+				});
 			}
 		}
 		const updatedUser = await this.usersService.updateUser(userId, data);
@@ -72,6 +70,6 @@ export class UsersController {
 			throw new NotFoundException(`O usuário logado não foi encontrado.`);
 		}
 
-		await this.usersService.deleteUserAndExperts(userId);
+		await this.usersService.deleteUser(userId);
 	}
 }
