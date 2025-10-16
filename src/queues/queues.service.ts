@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { addDays, startOfDay } from "date-fns";
-import { fromZonedTime } from "date-fns-tz";
+import { fromZonedTime, toZonedTime } from "date-fns-tz";
 import { PrismaService } from "src/database/prisma.service";
 import CreateQueueDto from "./dtos/create-queue";
 
@@ -12,9 +12,13 @@ export class QueuesService {
 
 	private calculateTodayIntervalUTC() {
 		const now = new Date();
-		const startOfTodayInServerTime = startOfDay(now);
+
+		const nowInBrazil = toZonedTime(now, this.TIMEZONE_BRASIL);
+
+		const startOfTodayInBrazil = startOfDay(nowInBrazil);
+
 		const startOfTodayUTC = fromZonedTime(
-			startOfTodayInServerTime,
+			startOfTodayInBrazil,
 			this.TIMEZONE_BRASIL
 		);
 
