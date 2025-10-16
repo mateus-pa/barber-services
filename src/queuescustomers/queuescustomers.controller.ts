@@ -75,15 +75,22 @@ export class QueuescustomersController {
 	@UseGuards(JwtAuthGuard)
 	@Patch(":id")
 	async attendCustomer(@Param("id") id: string, @Res() res: Response) {
-		const customer = await this.queuescustomersService.findCustomer(+id);
+		const customerId = parseInt(id, 10);
 
-		if (!customer) {
-			return res.status(HttpStatus.NOT_FOUND).json({
-				error: "O cliente não foi encontrado",
+		if (isNaN(customerId)) {
+			return res.status(HttpStatus.BAD_REQUEST).json({
+				error: "ID do cliente inválido.",
 			});
 		}
 
-		await this.queuescustomersService.attendCustomer(customer.id);
+		const customer = await this.queuescustomersService.findCustomer(customerId);
+
+		if (!customer) {
+			return res.status(HttpStatus.NOT_FOUND).json({
+				error: "O cliente não foi encontrado",
+			});
+		}
+		await this.queuescustomersService.attendCustomer(customerId);
 		return res.status(HttpStatus.NO_CONTENT).send();
 	}
 
